@@ -98,7 +98,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 Jacson Pedrotti 
 
-Link do Projeto: [https://vedere-films.vercel.app]
+Link do Projeto: <a target="_blank">[https://vedere-films.vercel.app] </a>
 
 ---
 
