@@ -329,8 +329,6 @@ export default function Home() {
             preload="auto"
             className="w-full h-full object-cover brightness-50 z-[-1]"
             style={{ position: 'absolute', inset: 0 }}
-            title="Vídeo do Hero"
-            aria-label="Vídeo do Hero"
           />
         </div>
         <div className="relative z-10 w-full flex flex-col items-end justify-end px-4 md:px-16 lg:px-32 pb-10 md:pb-20">
@@ -441,8 +439,6 @@ export default function Home() {
               preload="auto"
               className="object-cover w-full h-full"
               style={{ position: 'absolute', inset: 0 }}
-              title="Vídeo de Introdução ao Sobre"
-              aria-label="Vídeo de Introdução ao Sobre"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent opacity-40"></div>
             <div className="absolute bottom-0 left-0 right-0 p-4">
