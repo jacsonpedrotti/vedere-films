@@ -292,7 +292,7 @@ export default function Home() {
 
       {/* HERO RESTAURADO */}
       <section id="inicio" className="relative h-screen flex items-end overflow-hidden scroll-mt-20">
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 z-0">
           <video
             ref={videoRef}
             src="/video-hero.mp4"
@@ -301,9 +301,10 @@ export default function Home() {
             muted
             playsInline
             preload="auto"
-            className="w-full h-full object-cover brightness-50 z-[-1]"
+            className="w-full h-full object-cover"
             style={{ position: 'absolute', inset: 0 }}
           />
+          <div className="absolute inset-0 bg-black/50"></div>
         </div>
         <div className="relative z-10 w-full flex flex-col items-end justify-end px-4 md:px-16 lg:px-32 pb-10 md:pb-20">
           <div className="max-w-xl w-full text-center md:text-right mb-8 md:mb-12 mx-auto md:mx-0 mt-56 md:mt-72">
@@ -411,7 +412,7 @@ export default function Home() {
               muted
               playsInline
               preload="auto"
-              className="object-cover w-full h-full"
+              className="w-full h-full object-cover"
               style={{ position: 'absolute', inset: 0 }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent opacity-40"></div>
