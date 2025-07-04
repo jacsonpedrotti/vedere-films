@@ -390,6 +390,23 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
+  // Adicionar autoplay programático ao vídeo de sobre
+  useEffect(() => {
+    const ref = sobreRef.current;
+    const video = sobreVideoRef.current;
+    if (!ref || !video) return;
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          video.play().catch(() => {});
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(ref);
+    return () => observer.disconnect();
+  }, []);
+
   const anos = useCountUp(10, 4000, '+', countStarted);
   const clientes = useCountUp(5000, 4000, '+', countStarted);
 
