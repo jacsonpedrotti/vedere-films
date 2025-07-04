@@ -12,14 +12,6 @@ const videos = [
   "/envelopamento5.mp4"
 ];
 
-const subtitles = [
-  "Envelopamento Completo",
-  "Envelopamento Parcial",
-  "Envelopamento de Detalhes",
-  "Envelopamento Personalizado",
-  "Envelopamento Premium"
-];
-
 export default function Envelopamento() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -109,9 +101,6 @@ export default function Envelopamento() {
       </a>
       <main className="flex-1 flex flex-col items-center justify-center py-8 px-4">
         <h1 className="text-3xl md:text-5xl font-bold text-[#747B7A] mb-6 text-center mt-20">Envelopamento</h1>
-        <h2 className="text-xl md:text-2xl font-semibold text-[#747B7A] mb-6 text-center transition-all duration-300 ease-in-out">
-          {subtitles[currentVideoIndex]}
-        </h2>
         
         {/* Carrossel de Vídeos */}
         <div className="relative w-full max-w-[45vw] max-[1570px]:max-w-[700px] mb-6 mt-8">
