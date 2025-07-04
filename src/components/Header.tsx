@@ -34,8 +34,8 @@ export default function Header() {
           <Image src="/logo-vedere-50x50.png" alt="Vedere Films Logo" width={160} height={160} className="object-contain w-40 h-40 -my-12" />
         </a>
       </div>
-      {/* Desktop nav */}
-      <nav className="hidden md:flex items-center gap-8 ml-auto">
+      {/* Desktop nav - visível acima de 1200px */}
+      <nav className="hidden xl:flex items-center gap-8 ml-auto">
         {navItems.map((item) =>
           item.label === "Serviços" ? (
             <Menu as="div" className="relative" key={item.href}>
@@ -77,9 +77,9 @@ export default function Header() {
           )
         )}
       </nav>
-      {/* Mobile menu button */}
+      {/* Mobile menu button - visível abaixo de 1200px */}
       <button
-        className="md:hidden ml-auto flex items-center justify-center p-2"
+        className="xl:hidden ml-auto flex items-center justify-center p-2"
         onClick={() => setMobileOpen((v) => !v)}
         aria-label="Abrir menu"
       >
