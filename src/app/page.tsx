@@ -428,6 +428,8 @@ export default function Home() {
             preload="auto"
             className="w-full h-full object-cover brightness-50 z-[-1]"
             style={{ position: 'absolute', inset: 0 }}
+            title="Vídeo do Hero"
+            aria-label="Vídeo do Hero"
           />
         </div>
         <div className="relative z-10 w-full flex flex-col items-end justify-end px-4 md:px-16 lg:px-32 pb-10 md:pb-20">
@@ -531,12 +533,15 @@ export default function Home() {
             <video
               ref={sobreVideoRef}
               src="/video-intro-sobre.mp4"
+              autoPlay
               loop
               muted
               playsInline
               preload="auto"
               className="object-cover w-full h-full"
               style={{ position: 'absolute', inset: 0 }}
+              title="Vídeo de Introdução ao Sobre"
+              aria-label="Vídeo de Introdução ao Sobre"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent opacity-40"></div>
             <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -1430,7 +1435,7 @@ export default function Home() {
         <h2 className="text-3xl font-bold mb-12 text-[#747B7A] text-center">Como Chegar em Nossa Loja!</h2>
         <div className="rounded-lg overflow-hidden shadow-lg border border-[#222] w-[80vw] max-w-3xl mx-auto">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3535.9999999999995!2d-48.54999999999999!3d-27.599999999999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjfCsDM2JzAwLjAiUyA0OMKwMzMnMDAuMCJX!5e0!3m2!1spt-BR!2sbr!4v1680000000000!5m2!1spt-BR!2sbr"
+            src="https://www.google.com/maps?q=R.+Clemente+Rovere,+25+-+Centro,+Florianópolis+-+SC,+88015-440,+Brasil&output=embed"
             className="w-full"
             height="450"
             style={{ border: 0 }}
