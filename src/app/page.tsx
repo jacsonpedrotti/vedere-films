@@ -195,32 +195,6 @@ export default function Home() {
     }
   }, []);
 
-  // Forçar autoplay no vídeo do hero e tentar novamente em interação do usuário (iOS/Safari)
-  useEffect(() => {
-    const tryPlay = (video: HTMLVideoElement | null) => {
-      if (!video) return;
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          // Se falhar, aguarda interação do usuário
-        });
-      }
-    };
-    tryPlay(videoRef.current);
-    tryPlay(sobreVideoRef.current);
-    // iOS/Safari pode exigir interação do usuário
-    const onUserInteraction = () => {
-      tryPlay(videoRef.current);
-      tryPlay(sobreVideoRef.current);
-    };
-    window.addEventListener('touchend', onUserInteraction, { once: true });
-    window.addEventListener('click', onUserInteraction, { once: true });
-    return () => {
-      window.removeEventListener('touchend', onUserInteraction);
-      window.removeEventListener('click', onUserInteraction);
-    };
-  }, []);
-
   // Função para controlar reprodução de vídeos
   const handleVideoPlay = (serviceKey: string) => {
     setPlayingVideos(prev => ({
