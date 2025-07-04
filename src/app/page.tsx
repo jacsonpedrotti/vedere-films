@@ -195,6 +195,29 @@ export default function Home() {
     }
   }, []);
 
+  // Forçar autoplay após interação do usuário (especialmente para iOS)
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      if (videoRef.current) {
+        videoRef.current.play().catch(() => {});
+      }
+      if (sobreVideoRef.current) {
+        sobreVideoRef.current.play().catch(() => {});
+      }
+    };
+
+    // Adicionar listeners para interação do usuário
+    document.addEventListener('touchstart', handleUserInteraction, { once: true });
+    document.addEventListener('click', handleUserInteraction, { once: true });
+    document.addEventListener('scroll', handleUserInteraction, { once: true });
+
+    return () => {
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('scroll', handleUserInteraction);
+    };
+  }, []);
+
   // Função para controlar reprodução de vídeos
   const handleVideoPlay = (serviceKey: string) => {
     setPlayingVideos(prev => ({
@@ -292,20 +315,23 @@ export default function Home() {
 
       {/* HERO RESTAURADO */}
       <section id="inicio" className="relative h-screen flex items-end overflow-hidden scroll-mt-20">
-        <div className="absolute inset-0 z-0">
-          <video
-            ref={videoRef}
-            src="/video-hero.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            className="w-full h-full object-cover"
-            style={{ position: 'absolute', inset: 0 }}
-          />
-          <div className="absolute inset-0 bg-black/50"></div>
-        </div>
+        <video
+          ref={videoRef}
+          src="/video-hero.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ zIndex: -1 }}
+          onLoadedData={() => {
+            if (videoRef.current) {
+              videoRef.current.play().catch(() => {});
+            }
+          }}
+        />
+        <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative z-10 w-full flex flex-col items-end justify-end px-4 md:px-16 lg:px-32 pb-10 md:pb-20">
           <div className="max-w-xl w-full text-center md:text-right mb-8 md:mb-12 mx-auto md:mx-0 mt-56 md:mt-72">
             <h1 className="text-2xl sm:text-3xl md:text-5xl font-semibold mb-4 sm:mb-6 whitespace-nowrap text-[#747B7A]">
@@ -411,9 +437,13 @@ export default function Home() {
               loop
               muted
               playsInline
-              preload="auto"
-              className="w-full h-full object-cover"
-              style={{ position: 'absolute', inset: 0 }}
+              preload="metadata"
+              className="absolute inset-0 w-full h-full object-cover"
+              onLoadedData={() => {
+                if (sobreVideoRef.current) {
+                  sobreVideoRef.current.play().catch(() => {});
+                }
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent opacity-40"></div>
             <div className="absolute bottom-0 left-0 right-0 p-4">
