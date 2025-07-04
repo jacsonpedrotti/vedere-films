@@ -218,6 +218,17 @@ export default function Home() {
     };
   }, []);
 
+  // Forçar play do vídeo do hero após montagem
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.play().catch(() => {});
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   // Função para controlar reprodução de vídeos
   const handleVideoPlay = (serviceKey: string) => {
     setPlayingVideos(prev => ({
@@ -324,15 +335,17 @@ export default function Home() {
           playsInline
           preload="metadata"
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ zIndex: -1 }}
           onLoadedData={() => {
             if (videoRef.current) {
               videoRef.current.play().catch(() => {});
             }
           }}
+          onError={(e) => {
+            console.error('Erro no vídeo do hero:', e);
+          }}
         />
-        <div className="absolute inset-0 bg-black/50"></div>
-        <div className="relative z-10 w-full flex flex-col items-end justify-end px-4 md:px-16 lg:px-32 pb-10 md:pb-20">
+        <div className="absolute inset-0 bg-black/50 z-10"></div>
+        <div className="relative z-20 w-full flex flex-col items-end justify-end px-4 md:px-16 lg:px-32 pb-10 md:pb-20">
           <div className="max-w-xl w-full text-center md:text-right mb-8 md:mb-12 mx-auto md:mx-0 mt-56 md:mt-72">
             <h1 className="text-2xl sm:text-3xl md:text-5xl font-semibold mb-4 sm:mb-6 whitespace-nowrap text-[#747B7A]">
               <Typewriter
