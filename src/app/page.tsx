@@ -222,10 +222,8 @@ export default function Home() {
 
   // Forçar autoplay no vídeo do hero e tentar novamente em interação do usuário (iOS/Safari)
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const tryPlay = () => {
+    const tryPlay = (video: HTMLVideoElement | null) => {
+      if (!video) return;
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise.catch(() => {
@@ -233,45 +231,15 @@ export default function Home() {
         });
       }
     };
-
-    tryPlay();
-
+    tryPlay(videoRef.current);
+    tryPlay(sobreVideoRef.current);
     // iOS/Safari pode exigir interação do usuário
     const onUserInteraction = () => {
-      tryPlay();
+      tryPlay(videoRef.current);
+      tryPlay(sobreVideoRef.current);
     };
     window.addEventListener('touchend', onUserInteraction, { once: true });
     window.addEventListener('click', onUserInteraction, { once: true });
-
-    return () => {
-      window.removeEventListener('touchend', onUserInteraction);
-      window.removeEventListener('click', onUserInteraction);
-    };
-  }, []);
-
-  // Forçar autoplay no vídeo de sobre e tentar novamente em interação do usuário (iOS/Safari)
-  useEffect(() => {
-    const video = sobreVideoRef.current;
-    if (!video) return;
-
-    const tryPlay = () => {
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          // Se falhar, aguarda interação do usuário
-        });
-      }
-    };
-
-    tryPlay();
-
-    // iOS/Safari pode exigir interação do usuário
-    const onUserInteraction = () => {
-      tryPlay();
-    };
-    window.addEventListener('touchend', onUserInteraction, { once: true });
-    window.addEventListener('click', onUserInteraction, { once: true });
-
     return () => {
       window.removeEventListener('touchend', onUserInteraction);
       window.removeEventListener('click', onUserInteraction);
@@ -350,30 +318,6 @@ export default function Home() {
     "/foto-carrossel14.jpg",
     "/foto-carrossel15.jpg"
   ];
-
-  React.useEffect(() => {
-    if (!sobreVideoRef.current) return;
-    const video = sobreVideoRef.current;
-    let observer: IntersectionObserver;
-    if ('IntersectionObserver' in window) {
-      observer = new window.IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              video.play();
-            } else {
-              video.pause();
-            }
-          });
-        },
-        { threshold: 0.3 }
-      );
-      observer.observe(video);
-    }
-    return () => {
-      if (observer && video) observer.unobserve(video);
-    };
-  }, []);
 
   useEffect(() => {
     const ref = sobreRef.current;
