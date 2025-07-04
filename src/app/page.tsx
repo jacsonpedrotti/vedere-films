@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Header from "../components/Header";
@@ -49,6 +49,29 @@ const services = [
   }
 ];
 
+// Hook para animar números
+function useCountUp(to: number, duration: number, suffix = '', start = false) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!start) return;
+    let startValue = 0;
+    const increment = to / (duration / 16);
+    let raf: number;
+    function animate() {
+      startValue += increment;
+      if (startValue < to) {
+        setCount(Math.floor(startValue));
+        raf = requestAnimationFrame(animate);
+      } else {
+        setCount(to);
+      }
+    }
+    animate();
+    return () => cancelAnimationFrame(raf);
+  }, [to, duration, start]);
+  return `${count}${suffix}`;
+}
+
 export default function Home() {
   const [openFaq, setOpenFaq] = React.useState<number | null>(null);
   const [currentImage, setCurrentImage] = React.useState(0);
@@ -60,6 +83,8 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const sobreVideoRef = React.useRef<HTMLVideoElement>(null);
+  const [countStarted, setCountStarted] = useState(false);
+  const sobreRef = useRef<HTMLDivElement>(null);
 
   // Efeito para montagem do componente
   React.useEffect(() => {
@@ -350,6 +375,24 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    const ref = sobreRef.current;
+    if (!ref) return;
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setCountStarted(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(ref);
+    return () => observer.disconnect();
+  }, []);
+
+  const anos = useCountUp(10, 4000, '+', countStarted);
+  const clientes = useCountUp(5000, 4000, '+', countStarted);
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-[#ededed] flex flex-col overflow-x-hidden">
       <Header />
@@ -422,7 +465,7 @@ export default function Home() {
       </section>
 
       {/* SOBRE RESTAURADO */}
-      <section id="sobre" className="max-w-7xl mx-auto py-32 px-4 my-20 mt-64">
+      <section id="sobre" className="max-w-7xl mx-auto py-32 px-4 my-20 mt-64" ref={sobreRef}>
         <div className="grid md:grid-cols-2 gap-12 md:gap-24 lg:gap-[120px] items-center">
           <motion.div
             initial={{ opacity: 0, x: -50, scale: 0.95 }}
@@ -461,7 +504,7 @@ export default function Home() {
                     transition={{ duration: 0.6, delay: 0.2 }}
                     className="bg-[#181818] p-6 rounded-lg"
                   >
-                    <h3 className="text-2xl font-bold text-[#747B7A] mb-2">10+</h3>
+                    <h3 className="text-2xl font-bold text-[#747B7A] mb-2">{anos}</h3>
                     <p className="text-gray-300">Anos de Experiência</p>
                   </motion.div>
                   <motion.div
@@ -471,7 +514,7 @@ export default function Home() {
                     transition={{ duration: 0.6, delay: 0.4 }}
                     className="bg-[#181818] p-6 rounded-lg"
                   >
-                    <h3 className="text-2xl font-bold text-[#747B7A] mb-2">1000+</h3>
+                    <h3 className="text-2xl font-bold text-[#747B7A] mb-2">{clientes}</h3>
                     <p className="text-gray-300">Clientes Satisfeitos</p>
                   </motion.div>
                 </div>
