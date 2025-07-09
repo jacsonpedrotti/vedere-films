@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import CookieConsent from "../components/CookieConsent";
 import { Typewriter } from 'react-simple-typewriter';
 
 const navItems = [
@@ -20,32 +21,32 @@ const services = [
   {
     title: "Film Nanocerâmica HD",
     description: "Proteção máxima e conforto superior. Com tecnologia de ponta, bloqueia até 99% dos raios UV e 80% do calor infravermelho, sem interferir na visibilidade ou nos sinais eletrônicos.",
-    image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace"
+    image: "/nanoceramica-hd/foto-nano-ceramica-hd.webp"
   },
   {
     title: "Film Nanocerâmica PRO",
     description: "Desempenho e tecnologia de ponta para máxima proteção solar, conforto térmico e valorização do seu veículo. Bloqueia até 99% dos raios UV e mais de 90% do calor, sem interferir em sensores ou visibilidade.",
-    image: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738"
+    image: "/nanoceramica-pro/foto-nano-ceramica-pro.webp"
   },
   {
     title: "Clear Plex",
     description: "Blindagem invisível para o parabrisa. Protege contra impactos e arranhões, preservando sua visão e evitando substituições caras. Tecnologia desenvolvida para carros premium.",
-    image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace"
+    image: "/clearplex/foto-clear-plex.webp"
   },
   {
     title: "Películas Residenciais",
     description: "Conforto, privacidade e estilo para sua casa. Disponíveis em versões decorativas, jateadas ou fumê, transformam qualquer ambiente em um espaço mais funcional e agradável.",
-    image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace"
+    image: "/residencial/foto-residencial.webp"
   },
   {
     title: "PPF – Proteção de Pintura Premium",
     description: "Proteja e transforme. Com o Paint Protection Film, preservamos a pintura original do seu veículo contra riscos, manchas e detritos. Além disso, oferecemos a opção de mudança de tom para dar um toque único ao seu carro, sem comprometer o brilho e a sofisticação.",
-    image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace"
+    image: "/ppf/foto-ppf.webp"
   },
   {
     title: "Envelopamento",
     description: "Proteção e personalização completa para seu veículo. O envelopamento automotivo oferece proteção contra riscos, arranhões e intempéries, além de permitir personalização total da aparência do carro com materiais de alta qualidade.",
-    image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace"
+    image: "/envelopamento/foto-envelopamento.webp"
   }
 ];
 
@@ -58,12 +59,54 @@ export default function Home() {
   const [isPaused, setIsPaused] = React.useState(false);
   const [playingVideos, setPlayingVideos] = React.useState<{[key: string]: boolean}>({});
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [imageLoading, setImageLoading] = React.useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const sobreVideoRef = React.useRef<HTMLVideoElement>(null);
+  const [isTransitioning, setIsTransitioning] = React.useState(false);
+
+  // Exemplo seguro para detectar iOS
+  const isIOS = (() => {
+    if (typeof navigator === "undefined" || !navigator.userAgent) return false;
+    const iOSDevices = ["iPad", "iPhone", "iPod"];
+    return iOSDevices.some(device => navigator.userAgent.includes(device));
+  })();
+
+  // Otimizações específicas para iOS
+  const iOSOptimizations = () => {
+    // Forçar viewport para iOS
+    if (typeof document !== "undefined") {
+      const viewport = document.querySelector('meta[name="viewport"]');
+      if (!viewport) {
+        const meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+        document.head.appendChild(meta);
+      }
+    }
+
+    // Otimizar vídeos para iOS
+    if (videoRef.current && isIOS) {
+      videoRef.current.setAttribute('playsinline', 'true');
+      videoRef.current.setAttribute('webkit-playsinline', 'true');
+      videoRef.current.setAttribute('muted', 'true');
+    }
+    if (sobreVideoRef.current && isIOS) {
+      sobreVideoRef.current.setAttribute('playsinline', 'true');
+      sobreVideoRef.current.setAttribute('webkit-playsinline', 'true');
+      sobreVideoRef.current.setAttribute('muted', 'true');
+    }
+  };
+
+  // Aplicar otimizações no mount
+  React.useEffect(() => {
+    iOSOptimizations();
+  }, []);
 
   // Efeito para montagem do componente
   React.useEffect(() => {
     setIsMounted(true);
+    // Reset do estado de carregamento na montagem
+    setImageLoading(true);
   }, []);
 
   // Efeito para lidar com o atributo cz-shortcut-listen
@@ -229,6 +272,8 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
+
+
   // Função para controlar reprodução de vídeos
   const handleVideoPlay = (serviceKey: string) => {
     setPlayingVideos(prev => ({
@@ -285,28 +330,62 @@ export default function Home() {
   };
 
   const images = [
-    "/foto-carrossel1.jpg",
-    "/foto-carrossel2.jpg",
-    "/foto-carrossel3.jpg",
-    "/foto-carrossel4.jpg",
-    "/foto-carrossel5.jpg",
-    "/foto-carrossel6.jpg",
-    "/foto-carrossel7.jpg",
-    "/foto-carrossel8.jpg",
-    "/foto-carrossel9.jpg",
-    "/foto-carrossel10.jpg",
-    "/foto-carrossel11.jpg",
-    "/foto-carrossel12.jpg",
-    "/foto-carrossel13.jpg",
-    "/foto-carrossel14.jpg",
-    "/foto-carrossel15.jpg"
+    "/carrossel-de-fotos/foto-carrossel1.webp",
+    "/carrossel-de-fotos/foto-carrossel2.webp",
+    "/carrossel-de-fotos/foto-carrossel3.webp",
+    "/carrossel-de-fotos/foto-carrossel4.webp",
+    "/carrossel-de-fotos/foto-carrossel5.webp",
+    "/carrossel-de-fotos/foto-carrossel6.webp",
+    "/carrossel-de-fotos/foto-carrossel7.webp",
+    "/carrossel-de-fotos/foto-carrossel8.webp",
+    "/carrossel-de-fotos/foto-carrossel9.webp",
+    "/carrossel-de-fotos/foto-carrossel10.webp",
+    "/carrossel-de-fotos/foto-carrossel11.webp",
+    "/carrossel-de-fotos/foto-carrossel12.webp",
+    "/carrossel-de-fotos/foto-carrossel13.webp",
+    "/carrossel-de-fotos/foto-carrossel14.webp",
+    "/carrossel-de-fotos/foto-carrossel15.webp"
   ];
+
+  // Debounce para evitar múltiplos cliques
+  const handleImageChange = useCallback((newIndex: number) => {
+    if (isTransitioning) return;
+    
+    setIsTransitioning(true);
+    setImageLoading(true); // Reset do estado de carregamento
+    setCurrentImage(newIndex);
+    
+    // Reset do estado de transição após a animação
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 300);
+  }, [isTransitioning]);
+
+  // Preload das próximas imagens
+  useEffect(() => {
+    // Pré-carrega apenas a próxima imagem do carrossel
+    const nextIndex = (currentImage + 1) % images.length;
+    const img = new window.Image();
+    img.src = images[nextIndex];
+    // Logs removidos para evitar poluição do console
+  }, [currentImage, images]);
+
+  // Navegação otimizada
+  const nextImage = useCallback(() => {
+    handleImageChange((currentImage + 1) % images.length);
+  }, [currentImage, images.length, handleImageChange]);
+
+  const prevImage = useCallback(() => {
+    handleImageChange(currentImage === 0 ? images.length - 1 : currentImage - 1);
+  }, [currentImage, images.length, handleImageChange]);
+
+
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-[#ededed] flex flex-col overflow-x-hidden">
       <Header />
       {/* Overlay fixo para stacking context */}
-      <div className="fixed inset-0 z-[99] pointer-events-none"></div>
+      <div className="fixed inset-0 z-[1] pointer-events-none"></div>
 
       {/* Botão flutuante WhatsApp */}
       <a
@@ -317,32 +396,52 @@ export default function Home() {
         style={{ animation: 'pulse 1.5s infinite' }}
       >
         <img
-          src="/gift-whats.gif"
+          src="/assets/gift-whats.gif"
           alt="WhatsApp"
           className="w-full h-full object-contain"
           draggable="false"
         />
       </a>
 
-      {/* HERO RESTAURADO */}
+      {/* HERO RESTAURADO - PRIMEIRO NA DOM */}
       <section id="inicio" className="relative h-screen flex items-end overflow-hidden scroll-mt-20">
         <video
           ref={videoRef}
-          src="/video-hero.mp4"
+          src="/assets/video-hero.mp4"
           autoPlay
           loop
           muted
           playsInline
-          preload="metadata"
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
           onLoadedData={() => {
             if (videoRef.current) {
-              videoRef.current.play().catch(() => {});
+              videoRef.current.play().catch(() => {
+                setTimeout(() => {
+                  if (videoRef.current) {
+                    videoRef.current.play().catch(() => {});
+                  }
+                }, 1000);
+              });
             }
           }}
           onError={(e) => {
             console.error('Erro no vídeo do hero:', e);
+            const videoElement = e.target as HTMLVideoElement;
+            if (videoElement.parentElement) {
+              const fallbackImg = document.createElement('img');
+              fallbackImg.src = '/logo-simples.png';
+              fallbackImg.alt = 'Vedere Films Hero';
+              fallbackImg.className = 'absolute inset-0 w-full h-full object-cover';
+              videoElement.parentElement.appendChild(fallbackImg);
+            }
           }}
+          onCanPlay={() => {
+            console.log('Vídeo hero carregado com sucesso');
+          }}
+          webkit-playsinline="true"
+          x-webkit-airplay="allow"
+          poster="/assets/logo-simples.png"
         />
         <div className="absolute inset-0 bg-black/50 z-10"></div>
         <div className="relative z-20 w-full flex flex-col items-end justify-end px-4 md:px-16 lg:px-32 pb-10 md:pb-20">
@@ -379,8 +478,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SOBRE RESTAURADO */}
-      <section id="sobre" className="max-w-7xl mx-auto py-32 px-4 my-20 mt-64">
+      {/* SOBRE RESTAURADO - SEGUNDO NA DOM */}
+      <section id="sobre" className="max-w-7xl mx-auto py-32 px-4 my-20 mt-64 relative z-[10]">
         <div className="grid md:grid-cols-2 gap-12 md:gap-24 lg:gap-[120px] items-center">
           <motion.div
             initial={{ opacity: 0, x: -50, scale: 0.95 }}
@@ -397,7 +496,7 @@ export default function Home() {
                 className="w-full max-w-[400px] flex justify-center md:justify-start mb-8"
               >
                 <Image
-                  src="/logo-simples.png"
+                  src="/assets/logo-simples.png"
                   alt="Vedere Films Logo"
                   width={400}
                   height={133}
@@ -445,34 +544,23 @@ export default function Home() {
           >
             <video
               ref={sobreVideoRef}
-              src="/video-intro-sobre.mp4"
+              src="/assets/video-intro-sobre.mp4"
               autoPlay
               loop
               muted
               playsInline
-              preload="metadata"
+              preload="auto"
               className="absolute inset-0 w-full h-full object-cover"
+              poster="/assets/logo-simples.png"
               onLoadedData={() => {
                 if (sobreVideoRef.current) {
                   sobreVideoRef.current.play().catch(() => {});
                 }
               }}
+              onError={(e) => {
+                console.error('Erro no vídeo sobre:', e);
+              }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent opacity-40"></div>
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                className="bg-[#181818]/80 backdrop-blur p-4 rounded-lg"
-              >
-                <h3 className="text-lg font-bold text-[#747B7A] mb-1">Compromisso com a Excelência</h3>
-                <p className="text-sm text-gray-300">
-                  Trabalhamos com foco na qualidade, do início ao fim de cada projeto. Nosso compromisso está nos detalhes, na escolha dos materiais e no cuidado com cada etapa. Mais do que um resultado bonito, buscamos entregar confiança e excelência em tudo o que fazemos.
-                </p>
-              </motion.div>
-            </div>
           </motion.div>
         </div>
       </section>
@@ -677,7 +765,7 @@ export default function Home() {
             <a href="/servicos/film-ceramica" className="bg-[#181818] rounded-lg p-10 shadow-lg hover:shadow-xl transition-shadow" style={{ minWidth: '25%', padding: '0 1.5rem', display: 'block' }}>
               <div className="relative h-72 mb-8 rounded-lg overflow-hidden group cursor-pointer">
                 <img
-                  src="/foto-nano-ceramica-hd.png"
+                  src="/nanoceramica-hd/foto-nano-ceramica-hd.webp"
                   alt="Film Nanocerâmica HD"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -688,10 +776,10 @@ export default function Home() {
               </p>
             </a>
             {/* Film Nanocerâmica PRO */}
-            <a href="/servicos/film-carbono" className="bg-[#181818] rounded-lg p-10 shadow-lg hover:shadow-xl transition-shadow" style={{ minWidth: '25%', padding: '0 1.5rem', display: 'block' }}>
+            <a href="/servicos/film-ceramica-pro" className="bg-[#181818] rounded-lg p-10 shadow-lg hover:shadow-xl transition-shadow" style={{ minWidth: '25%', padding: '0 1.5rem', display: 'block' }}>
               <div className="relative h-72 mb-8 rounded-lg overflow-hidden group cursor-pointer">
                 <img
-                  src="/foto-nano-ceramica-pro.png"
+                  src="/nanoceramica-pro/foto-nano-ceramica-pro.webp"
                   alt="Film Nanocerâmica PRO"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -705,7 +793,7 @@ export default function Home() {
             <a href="/servicos/clear-plex" className="bg-[#181818] rounded-lg p-10 shadow-lg hover:shadow-xl transition-shadow" style={{ minWidth: '25%', padding: '0 1.5rem', display: 'block' }}>
               <div className="relative h-72 mb-8 rounded-lg overflow-hidden group cursor-pointer">
                 <img
-                  src="/foto-clear-plex.png"
+                  src="/clearplex/foto-clear-plex.webp"
                   alt="Clear Plex"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -719,7 +807,7 @@ export default function Home() {
             <a href="/servicos/peliculas-residenciais" className="bg-[#181818] rounded-lg p-10 shadow-lg hover:shadow-xl transition-shadow" style={{ minWidth: '25%', padding: '0 1.5rem', display: 'block' }}>
               <div className="relative h-72 mb-8 rounded-lg overflow-hidden group cursor-pointer">
                 <img
-                  src="/foto-residencial.png"
+                  src="/residencial/foto-residencial.webp"
                   alt="Películas Residenciais"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -733,7 +821,7 @@ export default function Home() {
             <a href="/servicos/ppf" className="bg-[#181818] rounded-lg p-10 shadow-lg hover:shadow-xl transition-shadow" style={{ minWidth: '25%', padding: '0 1.5rem', display: 'block' }}>
               <div className="relative h-72 mb-8 rounded-lg overflow-hidden group cursor-pointer">
                 <img
-                  src="/foto-ppf.png"
+                  src="/ppf/foto-ppf.webp"
                   alt="PPF – Proteção de Pintura Premium"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -747,7 +835,7 @@ export default function Home() {
             <a href="/servicos/envelopamento" className="bg-[#181818] rounded-lg p-10 shadow-lg hover:shadow-xl transition-shadow" style={{ minWidth: '25%', padding: '0 1.5rem', display: 'block' }}>
               <div className="relative h-72 mb-8 rounded-lg overflow-hidden group cursor-pointer">
                 <img
-                  src="/foto-envelopamento.png"
+                  src="/envelopamento/foto-envelopamento.webp"
                   alt="Envelopamento"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -778,7 +866,7 @@ export default function Home() {
             <div className="bg-[#181818] rounded-lg p-6 md:p-8 shadow-lg group-hover:shadow-xl transition-shadow">
               <div className="relative h-56 md:h-72 mb-6 md:mb-8 rounded-lg overflow-hidden group cursor-pointer">
                 <img
-                  src="/foto-nano-ceramica-hd.png"
+                  src="/nanoceramica-hd/foto-nano-ceramica-hd.webp"
                   alt="Film Nanocerâmica HD"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -789,11 +877,11 @@ export default function Home() {
               </p>
             </div>
           </a>
-          <a href="/servicos/film-carbono" className="block group">
+          <a href="/servicos/film-ceramica-pro" className="block group">
             <div className="bg-[#181818] rounded-lg p-6 md:p-8 shadow-lg group-hover:shadow-xl transition-shadow">
               <div className="relative h-56 md:h-72 mb-6 md:mb-8 rounded-lg overflow-hidden group cursor-pointer">
                 <img
-                  src="/foto-nano-ceramica-pro.png"
+                  src="/nanoceramica-pro/foto-nano-ceramica-pro.webp"
                   alt="Film Nanocerâmica PRO"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -808,7 +896,7 @@ export default function Home() {
             <div className="bg-[#181818] rounded-lg p-6 md:p-8 shadow-lg group-hover:shadow-xl transition-shadow">
               <div className="relative h-56 md:h-72 mb-6 md:mb-8 rounded-lg overflow-hidden group cursor-pointer">
                 <img
-                  src="/foto-clear-plex.png"
+                  src="/clearplex/foto-clear-plex.webp"
                   alt="Clear Plex"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -823,7 +911,7 @@ export default function Home() {
             <div className="bg-[#181818] rounded-lg p-6 md:p-8 shadow-lg group-hover:shadow-xl transition-shadow">
               <div className="relative h-56 md:h-72 mb-6 md:mb-8 rounded-lg overflow-hidden group cursor-pointer">
                 <img
-                  src="/foto-residencial.png"
+                  src="/residencial/foto-residencial.webp"
                   alt="Películas Residenciais"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -838,7 +926,7 @@ export default function Home() {
             <div className="bg-[#181818] rounded-lg p-6 md:p-8 shadow-lg group-hover:shadow-xl transition-shadow">
               <div className="relative h-56 md:h-72 mb-6 md:mb-8 rounded-lg overflow-hidden group cursor-pointer">
                 <img
-                  src="/foto-ppf.png"
+                  src="/ppf/foto-ppf.webp"
                   alt="PPF – Proteção de Pintura Premium"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -853,7 +941,7 @@ export default function Home() {
             <div className="bg-[#181818] rounded-lg p-6 md:p-8 shadow-lg group-hover:shadow-xl transition-shadow">
               <div className="relative h-56 md:h-72 mb-6 md:mb-8 rounded-lg overflow-hidden group cursor-pointer">
                 <img
-                  src="/foto-envelopamento.png"
+                  src="/envelopamento/foto-envelopamento.webp"
                   alt="Envelopamento"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -868,22 +956,47 @@ export default function Home() {
       </section>
 
       {/* Galeria */}
-      <section id="galeria" className="w-[90vw] max-w-[1800px] mx-auto py-20 px-4">
+      <section id="galeria" className="w-[90vw] max-w-[1800px] mx-auto py-20 px-4 relative z-[10]">
         <h2 className="text-3xl font-bold mb-12 text-[#747B7A] text-center">Galeria de Trabalhos</h2>
         <div className="relative">
           <motion.div 
-            className="relative h-[600px] md:h-[800px] rounded-xl overflow-hidden"
+            className="relative h-[600px] md:h-[1000px] rounded-xl overflow-hidden"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
+            {imageLoading && (
+              <div className="absolute inset-0 bg-[#181818] flex items-center justify-center z-10">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#747B7A] mx-auto mb-4"></div>
+                  <p className="text-[#747B7A]">Carregando galeria...</p>
+                </div>
+              </div>
+            )}
             <Image
               src={images[currentImage]}
               alt="Trabalho Vedere Films"
               fill
               className="object-cover"
-              priority
+              priority={currentImage === 0}
+              sizes="(max-width: 768px) 90vw, 1800px"
+              style={{ 
+                willChange: 'transform',
+                transform: 'translateZ(0)' // Força aceleração de hardware
+              }}
+              onLoad={() => {
+                console.log('Imagem carregada com sucesso:', images[currentImage]);
+                setImageLoading(false);
+              }}
+              onError={(e) => {
+                console.error('Erro ao carregar imagem:', images[currentImage]);
+                setImageLoading(false);
+                // Fallback para primeira imagem se houver erro
+                if (currentImage !== 0) {
+                  setCurrentImage(0);
+                }
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-60"></div>
           </motion.div>
@@ -893,10 +1006,11 @@ export default function Home() {
             {images.map((_, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentImage(index)}
+                onClick={() => handleImageChange(index)}
+                disabled={isTransitioning}
                 className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ease-in-out ${
                   currentImage === index ? 'bg-[#747B7A] w-6 md:w-8' : 'bg-white/50 hover:bg-white/80'
-                }`}
+                } ${isTransitioning ? 'opacity-50 cursor-not-allowed' : ''}`}
                 aria-label={`Ir para imagem ${index + 1}`}
               />
             ))}
@@ -904,48 +1018,33 @@ export default function Home() {
 
           {/* Botões de navegação */}
           <button
-            onClick={() => setCurrentImage((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
-            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-[#181818]/80 p-2 md:p-3 rounded-full hover:bg-[#181818] transition-colors"
+            onClick={prevImage}
+            disabled={isTransitioning}
+            className={`absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-[#181818]/80 p-2 md:p-3 rounded-full hover:bg-[#181818] transition-colors ${
+              isTransitioning ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#747B7A] md:w-6 md:h-6">
               <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
           <button
-            onClick={() => setCurrentImage((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
-            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-[#181818]/80 p-2 md:p-3 rounded-full hover:bg-[#181818] transition-colors"
+            onClick={nextImage}
+            disabled={isTransitioning}
+            className={`absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-[#181818]/80 p-2 md:p-3 rounded-full hover:bg-[#181818] transition-colors ${
+              isTransitioning ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#747B7A] md:w-6 md:h-6">
               <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
         </div>
-
-        {/* Miniaturas */}
-        <div className="mt-8 grid grid-cols-4 md:grid-cols-6 gap-4">
-          {images.map((image, index) => (
-            <motion.button
-              key={index}
-              onClick={() => setCurrentImage(index)}
-              whileHover={{ scale: 1.05 }}
-              className={`relative aspect-square rounded-lg overflow-hidden ${
-                currentImage === index ? 'ring-2 ring-[#747B7A]' : ''
-              }`}
-            >
-              <Image
-                src={image}
-                alt={`Trabalho ${index + 1}`}
-                fill
-                className="object-cover"
-              />
-            </motion.button>
-          ))}
-        </div>
       </section>
 
       {/* FAQ */}
       <section id="faq" className="max-w-4xl mx-auto py-20 px-4">
-        <h2 className="text-3xl font-bold mb-12 text-[#747B7A] text-center">Perguntas Frequentes</h2>
+        <h2 className="text-2xl font-bold mb-12 text-[#747B7A] text-center">Perguntas Frequentes</h2>
         <div className="space-y-4">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -962,10 +1061,10 @@ export default function Home() {
               <motion.div
                 animate={{ rotate: openFaq === 1 ? 180 : 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-16 h-8 relative"
+                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 relative"
               >
                 <Image
-                  src="/logo-simples.png"
+                  src="/assets/logo-simples.png"
                   alt="Logo Vedere Films"
                   fill
                   className="object-contain"
@@ -1000,10 +1099,10 @@ export default function Home() {
               <motion.div
                 animate={{ rotate: openFaq === 2 ? 180 : 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-16 h-8 relative"
+                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 relative"
               >
                 <Image
-                  src="/logo-simples.png"
+                  src="/assets/logo-simples.png"
                   alt="Logo Vedere Films"
                   fill
                   className="object-contain"
@@ -1040,10 +1139,10 @@ export default function Home() {
               <motion.div
                 animate={{ rotate: openFaq === 3 ? 180 : 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-16 h-8 relative"
+                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 relative"
               >
                 <Image
-                  src="/logo-simples.png"
+                  src="/assets/logo-simples.png"
                   alt="Logo Vedere Films"
                   fill
                   className="object-contain"
@@ -1079,10 +1178,10 @@ export default function Home() {
               <motion.div
                 animate={{ rotate: openFaq === 4 ? 180 : 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-16 h-8 relative"
+                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 relative"
               >
                 <Image
-                  src="/logo-simples.png"
+                  src="/assets/logo-simples.png"
                   alt="Logo Vedere Films"
                   fill
                   className="object-contain"
@@ -1118,10 +1217,10 @@ export default function Home() {
               <motion.div
                 animate={{ rotate: openFaq === 5 ? 180 : 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-16 h-8 relative"
+                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 relative"
               >
                 <Image
-                  src="/logo-simples.png"
+                  src="/assets/logo-simples.png"
                   alt="Logo Vedere Films"
                   fill
                   className="object-contain"
@@ -1157,10 +1256,10 @@ export default function Home() {
               <motion.div
                 animate={{ rotate: openFaq === 6 ? 180 : 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-16 h-8 relative"
+                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 relative"
               >
                 <Image
-                  src="/logo-simples.png"
+                  src="/assets/logo-simples.png"
                   alt="Logo Vedere Films"
                   fill
                   className="object-contain"
@@ -1196,7 +1295,7 @@ export default function Home() {
             >
               <div className="relative w-16 h-16 mb-4 mx-auto">
                 <Image
-                  src="/icon-instagram.png"
+                  src="assets/icon-instagram.png"
                   alt="Instagram"
                   fill
                   className="object-contain group-hover:opacity-80 transition-opacity"
@@ -1233,7 +1332,7 @@ export default function Home() {
                 className="flex items-center gap-4 hover:text-[#747B7A] transition-colors justify-start"
               >
                 <Image
-                  src="/icon-whatsapp.png"
+                  src="/assets/icon-whatsapp.png"
                   alt="WhatsApp"
                   width={32}
                   height={32}
@@ -1251,7 +1350,7 @@ export default function Home() {
                 className="flex items-center gap-4 hover:text-[#747B7A] transition-colors justify-start"
               >
                 <Image
-                  src="/icon-instagram.png"
+                  src="/assets/icon-instagram.png"
                   alt="Instagram"
                   width={32}
                   height={32}
@@ -1269,7 +1368,7 @@ export default function Home() {
                 className="flex items-center gap-4 hover:text-[#747B7A] transition-colors justify-start"
               >
                 <Image
-                  src="/icon-localização.png"
+                  src="/assets/icon-localização.png"
                   alt="Localização"
                   width={32}
                   height={32}
@@ -1350,11 +1449,12 @@ export default function Home() {
         <h2 className="text-3xl font-bold mb-12 text-[#747B7A] text-center">Como Chegar em Nossa Loja!</h2>
         <div className="rounded-lg overflow-hidden shadow-lg border border-[#222] w-[80vw] max-w-3xl mx-auto">
           <iframe
-            src="https://www.google.com/maps?q=R.+Clemente+Rovere,+25+-+Centro,+Florianópolis+-+SC,+88015-440,+Brasil&output=embed"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3535.844389680162!2d-48.547620222823745!3d-27.598353622203213!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x952749fa5df2a80b%3A0x7f61e8e51dece1!2sVedere%20films!5e0!3m2!1sen!2sbr!4v1751926242368!5m2!1sen!2sbr"
             className="w-full"
             height="450"
             style={{ border: 0 }}
             allowFullScreen={true}
+            loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             title="Mapa da localização"
           ></iframe>
@@ -1362,6 +1462,7 @@ export default function Home() {
       </section>
 
       <Footer />
+      <CookieConsent />
     </div>
   );
 }

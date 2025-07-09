@@ -5,11 +5,10 @@ import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 
 const videos = [
-  "/envelopamento1.mp4",
-  "/envelopamento2.mp4",
-  "/envelopamento3.mp4",
-  "/envelopamento4.mp4",
-  "/envelopamento5.mp4"
+  "/envelopamento/envelopamento1.mp4",
+  "/envelopamento/envelopamento2.mp4",
+  "/envelopamento/envelopamento3.mp4",
+  "/envelopamento/envelopamento4.mp4" 
 ];
 
 export default function Envelopamento() {
@@ -17,6 +16,12 @@ export default function Envelopamento() {
   const [isLoading, setIsLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [userMuted, setUserMuted] = useState(true);
+  const [isClient, setIsClient] = useState(false);
+
+  // Verificar se está no cliente
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const nextVideo = () => {
     setIsLoading(true);
@@ -39,14 +44,18 @@ export default function Envelopamento() {
 
   // Carregar preferência de mute do usuário
   useEffect(() => {
+    if (!isClient) return;
+
     const savedMuted = localStorage.getItem('envelopamentoMuted');
     if (savedMuted !== null) {
       setUserMuted(savedMuted === 'true');
     }
-  }, []);
+  }, [isClient]);
 
   // Salvar preferência de mute do usuário
   const handleMuteChange = (muted: boolean) => {
+    if (!isClient) return;
+
     setUserMuted(muted);
     localStorage.setItem('envelopamentoMuted', muted.toString());
   };
@@ -93,7 +102,7 @@ export default function Envelopamento() {
         style={{ animation: 'pulse 1.5s infinite' }}
       >
         <img
-          src="/gift-whats.gif"
+          src="/assets/gift-whats.gif"
           alt="WhatsApp"
           className="w-full h-full object-contain"
           draggable="false"
@@ -101,7 +110,7 @@ export default function Envelopamento() {
       </a>
       <main className="flex-1 flex flex-col items-center justify-center py-8 px-4">
         <h1 className="text-3xl md:text-5xl font-bold text-[#747B7A] mb-6 text-center mt-20">Envelopamento</h1>
-        
+
         {/* Carrossel de Vídeos */}
         <div className="relative w-full max-w-[45vw] max-[1570px]:max-w-[700px] mb-6 mt-8">
           {/* Vídeo Principal */}
@@ -132,9 +141,7 @@ export default function Envelopamento() {
                 }
               }}
             >
-              <source src={videos[currentVideoIndex]} type="video/quicktime" />
               <source src={videos[currentVideoIndex]} type="video/mp4" />
-              <source src={videos[currentVideoIndex]} />
               Seu navegador não suporta o vídeo.
             </video>
           </div>
@@ -147,7 +154,7 @@ export default function Envelopamento() {
             type="button"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-[#747B7A]">
-              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           <button
@@ -157,7 +164,7 @@ export default function Envelopamento() {
             type="button"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-[#747B7A]">
-              <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
 
@@ -167,9 +174,8 @@ export default function Envelopamento() {
               <button
                 key={index}
                 onClick={() => goToVideo(index)}
-                className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ease-in-out cursor-pointer ${
-                  currentVideoIndex === index ? 'bg-[#747B7A] w-6 md:w-8' : 'bg-white/50 hover:bg-white/80'
-                }`}
+                className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ease-in-out cursor-pointer ${currentVideoIndex === index ? 'bg-[#747B7A] w-6 md:w-8' : 'bg-white/50 hover:bg-white/80'
+                  }`}
                 aria-label={`Ir para vídeo ${index + 1}`}
                 type="button"
               />
@@ -183,7 +189,7 @@ export default function Envelopamento() {
         </div>
 
         <p className="text-base md:text-lg leading-relaxed text-justify max-w-3xl mx-auto mt-10">
-          O envelopamento automotivo é uma técnica de proteção e personalização que envolve a aplicação de filmes especiais sobre a superfície do veículo. Esta solução oferece proteção contra riscos, arranhões e intempéries, além de permitir personalização completa da aparência do carro.<br/><br/>
+          O envelopamento automotivo é uma técnica de proteção e personalização que envolve a aplicação de filmes especiais sobre a superfície do veículo. Esta solução oferece proteção contra riscos, arranhões e intempéries, além de permitir personalização completa da aparência do carro.<br /><br />
           Nossos serviços de envelopamento incluem desde proteção parcial até envelopamento completo, utilizando materiais de alta qualidade que preservam a integridade da pintura original. O processo é reversível e pode ser removido sem danificar a superfície do veículo, oferecendo flexibilidade total para mudanças de estilo ou venda do automóvel.
         </p>
       </main>

@@ -1,20 +1,19 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 
 const videos = [
-  "/ppf/PPF1.mp4",
-  "/ppf/PPF2.mp4"
+  "/nanoceramica-pro/nano-ceramica-pro1.mp4",
+  "/nanoceramica-pro/nano-ceramica-pro2.mp4",
+  "/nanoceramica-pro/nano-ceramica-pro3.mp4",
+  "/nanoceramica-pro/nano-ceramica-pro4.mp4",
+  "/nanoceramica-pro/nano-ceramica-pro5.mp4",
+  "/nanoceramica-pro/nano-ceramica-pro6.mp4"
 ];
 
-const subtitles = [
-  "PPF matte (PPF fosco acetinado)",
-  "PPF brilho"
-];
-
-export default function PPF() {
+export default function FilmNanoceramicaPRO() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -48,8 +47,8 @@ export default function PPF() {
   // Carregar preferência de mute do usuário
   useEffect(() => {
     if (!isClient) return;
-    
-    const savedMuted = localStorage.getItem('ppfMuted');
+
+    const savedMuted = localStorage.getItem('filmCarbonoMuted');
     if (savedMuted !== null) {
       setUserMuted(savedMuted === 'true');
     }
@@ -58,9 +57,9 @@ export default function PPF() {
   // Salvar preferência de mute do usuário
   const handleMuteChange = (muted: boolean) => {
     if (!isClient) return;
-    
+
     setUserMuted(muted);
-    localStorage.setItem('ppfMuted', muted.toString());
+    localStorage.setItem('filmCarbonoMuted', muted.toString());
   };
 
   useEffect(() => {
@@ -78,20 +77,6 @@ export default function PPF() {
       }
     }
   }, [currentVideoIndex, userMuted]);
-
-  // Navegação por teclado
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft') {
-        prevVideo();
-      } else if (event.key === 'ArrowRight') {
-        nextVideo();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentVideoIndex]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-[#ededed] flex flex-col">
@@ -112,14 +97,9 @@ export default function PPF() {
         />
       </a>
       <main className="flex-1 flex flex-col items-center justify-center py-8 px-4">
-        <h1 className="text-3xl md:text-5xl font-bold text-[#747B7A] mb-6 text-center mt-20">PPF – Proteção de Pintura Premium</h1>
-        <h2 className="text-xl md:text-2xl font-semibold text-[#747B7A] mb-6 text-center transition-all duration-300 ease-in-out">
-          {subtitles[currentVideoIndex]}
-        </h2>
-        
-        {/* Carrossel de Vídeos */}
+        <h1 className="text-3xl md:text-5xl font-bold text-[#747B7A] mb-6 text-center mt-20">Film Nanocerâmica PRO</h1>
         <div className="relative w-full max-w-[45vw] max-[1570px]:max-w-[700px] mb-6 mt-8">
-          {/* Vídeo Principal */}
+          {/* Carrossel de Vídeos */}
           <div className="w-full aspect-[16/10] rounded-lg overflow-hidden shadow-2xl relative bg-black">
             {isLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-[#181818] z-10">
@@ -132,7 +112,7 @@ export default function PPF() {
               controls
               controlsList="nodownload"
               className="w-full h-full object-cover rounded-lg"
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
+              style={{ objectFit: "cover", objectPosition: "center" }}
               autoPlay
               muted={userMuted}
               playsInline
@@ -151,7 +131,6 @@ export default function PPF() {
               Seu navegador não suporta o vídeo.
             </video>
           </div>
-
           {/* Botões de Navegação */}
           <button
             onClick={prevVideo}
@@ -160,7 +139,7 @@ export default function PPF() {
             type="button"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-[#747B7A]">
-              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           <button
@@ -170,34 +149,26 @@ export default function PPF() {
             type="button"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-[#747B7A]">
-              <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-
           {/* Indicadores */}
           <div className="flex justify-center gap-2 mt-4">
             {videos.map((video, index) => (
               <button
                 key={index}
                 onClick={() => goToVideo(index)}
-                className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ease-in-out cursor-pointer ${
-                  currentVideoIndex === index ? 'bg-[#747B7A] w-6 md:w-8' : 'bg-white/50 hover:bg-white/80'
-                }`}
+                className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ease-in-out cursor-pointer ${currentVideoIndex === index ? "bg-[#747B7A] w-6 md:w-8" : "bg-white/50 hover:bg-white/80"
+                  }`}
                 aria-label={`Ir para vídeo ${index + 1}`}
-                type="button"
               />
             ))}
           </div>
-
-          {/* Indicador de vídeo atual */}
-          <div className="text-center mt-2 text-sm text-[#747B7A]">
-            Vídeo {currentVideoIndex + 1} de {videos.length}
-          </div>
         </div>
-
         <p className="text-base md:text-lg leading-relaxed text-justify max-w-3xl mx-auto mt-10">
-          O PPF (Paint Protection Film) é uma película de proteção automotiva de alta performance, desenvolvida para preservar a pintura original do veículo contra riscos, arranhões, manchas, detritos e agressões do dia a dia. Fabricado com poliuretano de última geração, o PPF é praticamente invisível, mantendo o brilho e a cor do carro sem alterar sua aparência.<br/><br/>
-          Sua tecnologia avançada proporciona autorregeneração de pequenos riscos com o calor, alta resistência a impactos e proteção contra raios UV, evitando o desbotamento da pintura. O PPF também facilita a limpeza, impede a aderência de sujeira e protege contra produtos químicos e intempéries. É a solução ideal para quem deseja manter o veículo sempre com aspecto de novo, valorizando o investimento e garantindo máxima durabilidade, sofisticação e exclusividade ao automóvel.
+          A película automotiva Nanocerâmica PRO é referência em tecnologia, proteção e sofisticação para veículos de alto padrão. Desenvolvida com partículas cerâmicas em escala nanométrica, ela bloqueia até 99% dos raios UV e mais de 90% do calor infravermelho, garantindo conforto térmico superior, proteção do interior do veículo e preservação da saúde dos ocupantes.<br /><br />
+          Sua estrutura ultrafina e transparente mantém a máxima visibilidade, não interfere em sensores, GPS ou sinais eletrônicos, e oferece acabamento impecável, valorizando o visual do automóvel. A nanotecnologia empregada proporciona alta resistência a riscos, durabilidade excepcional (com garantia que pode ultrapassar 10 anos) e proteção contra desbotamento, envelhecimento e superaquecimento dos componentes internos.<br /><br />
+          Além de proteger contra impactos solares, a película Nanocerâmica PRO contribui para a segurança, pois ajuda a manter os vidros unidos em caso de quebra, reduzindo o risco de estilhaçamento. É a escolha ideal para quem busca o equilíbrio perfeito entre inovação, privacidade, eficiência energética e valorização do veículo, com o que há de mais avançado no mercado automotivo mundial.
         </p>
       </main>
       <Footer />

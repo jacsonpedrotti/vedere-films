@@ -26,3 +26,72 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Estilos específicos para o Headless UI */
+[data-headlessui-state] {
+  position: relative;
+}
+
+/* Garantir que o z-index funcione */
+.z-\[100\] {
+  z-index: 100 !important;
+}
+
+.z-\[101\] {
+  z-index: 101 !important;
+}
+
+.z-\[9999\] {
+  z-index: 9999 !important;
+}
+
+.z-\[10000\] {
+  z-index: 10000 !important;
+}
+
+/* Garantir que o header fique sempre visível */
+header {
+  z-index: 9999 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+/* Estilos para o backdrop blur */
+.backdrop-blur-0 {
+  backdrop-filter: blur(0px);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+/* Garantir que as cores funcionem */
+.bg-\[\#111\] {
+  background-color: #111;
+}
+
+.bg-\[\#222\] {
+  background-color: #222;
+}
+
+.bg-\[\#333\] {
+  background-color: #333;
+}
+
+.text-\[\#ededed\] {
+  color: #ededed;
+}
+
+.text-\[\#747B7A\] {
+  color: #747B7A;
+}
+
+.border-\[\#222\] {
+  border-color: #222;
+}
+
+.border-\[\#333\] {
+  border-color: #333;
+}

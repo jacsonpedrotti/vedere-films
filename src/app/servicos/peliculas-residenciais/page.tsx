@@ -4,32 +4,24 @@ import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 
 const videos = [
-  "/residencial1.mp4",
-  "/residencial2.mp4",
-  "/residencial3.mp4",
-  "/residencial4.mp4",
-  "/residencial5.mp4"
+  "/residencial/residencial1.mp4",
+  "/residencial/residencial2.mp4",
+  "/residencial/residencial3.mp4",
+  "/residencial/residencial4.mp4",
+  "/residencial/residencial5.mp4"
 ];
 
 export default function PeliculasResidenciais() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [userMuted, setUserMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [userMuted, setUserMuted] = useState(true);
+  const [isClient, setIsClient] = useState(false);
 
-  // Carregar preferência de mute do usuário
+  // Verificar se está no cliente
   useEffect(() => {
-    const savedMuted = localStorage.getItem('peliculasResidenciaisMuted');
-    if (savedMuted !== null) {
-      setUserMuted(savedMuted === 'true');
-    }
+    setIsClient(true);
   }, []);
-
-  // Salvar preferência de mute do usuário
-  const handleMuteChange = (muted: boolean) => {
-    setUserMuted(muted);
-    localStorage.setItem('peliculasResidenciaisMuted', muted.toString());
-  };
 
   const nextVideo = () => {
     setIsLoading(true);
@@ -48,6 +40,24 @@ export default function PeliculasResidenciais() {
   const goToVideo = (index: number) => {
     setIsLoading(true);
     setCurrentVideoIndex(index);
+  };
+
+  // Carregar preferência de mute do usuário
+  useEffect(() => {
+    if (!isClient) return;
+    
+    const savedMuted = localStorage.getItem('peliculasResidenciaisMuted');
+    if (savedMuted !== null) {
+      setUserMuted(savedMuted === 'true');
+    }
+  }, [isClient]);
+
+  // Salvar preferência de mute do usuário
+  const handleMuteChange = (muted: boolean) => {
+    if (!isClient) return;
+    
+    setUserMuted(muted);
+    localStorage.setItem('peliculasResidenciaisMuted', muted.toString());
   };
 
   // Garantir autoplay e aplicar mute preferido
@@ -79,7 +89,7 @@ export default function PeliculasResidenciais() {
         style={{ animation: 'pulse 1.5s infinite' }}
       >
         <img
-          src="/gift-whats.gif"
+          src="/assets/gift-whats.gif"
           alt="WhatsApp"
           className="w-full h-full object-contain"
           draggable="false"
@@ -117,9 +127,8 @@ export default function PeliculasResidenciais() {
                 }
               }}
             >
-              <source src={videos[currentVideoIndex]} type="video/quicktime" />
               <source src={videos[currentVideoIndex]} type="video/mp4" />
-              <source src={videos[currentVideoIndex]} />
+
               Seu navegador não suporta o vídeo.
             </video>
           </div>

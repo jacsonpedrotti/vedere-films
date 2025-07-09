@@ -4,11 +4,11 @@ import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 
 const videos = [
-  "/clear-plex1.mp4",
-  "/clear-plex2.mp4",
-  "/clear-plex3.mp4",
-  "/clear-plex4.mp4",
-  "/clear-plex5.mp4"
+  "/clearplex/clear-plex1.mp4",
+  "/clearplex/clear-plex2.mp4",
+  "/clearplex/clear-plex3.mp4",
+  "/clearplex/clear-plex4.mp4",
+  "/clearplex/clear-plex5.mp4"
 ];
 
 export default function ClearPlex() {
@@ -16,6 +16,12 @@ export default function ClearPlex() {
   const [isLoading, setIsLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [userMuted, setUserMuted] = useState(true);
+  const [isClient, setIsClient] = useState(false);
+
+  // Verificar se está no cliente
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const nextVideo = () => {
     setIsLoading(true);
@@ -38,14 +44,18 @@ export default function ClearPlex() {
 
   // Carregar preferência de mute do usuário
   useEffect(() => {
+    if (!isClient) return;
+    
     const savedMuted = localStorage.getItem('clearPlexMuted');
     if (savedMuted !== null) {
       setUserMuted(savedMuted === 'true');
     }
-  }, []);
+  }, [isClient]);
 
   // Salvar preferência de mute do usuário
   const handleMuteChange = (muted: boolean) => {
+    if (!isClient) return;
+    
     setUserMuted(muted);
     localStorage.setItem('clearPlexMuted', muted.toString());
   };
@@ -69,6 +79,21 @@ export default function ClearPlex() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-[#ededed] flex flex-col">
       <Header />
+      {/* Botão flutuante WhatsApp */}
+      <a
+        href="https://wa.me/5548996999796"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-0.5 z-[120] w-16 h-16 md:w-20 md:h-20 flex items-center justify-center drop-shadow-xl"
+        style={{ animation: 'pulse 1.5s infinite' }}
+      >
+        <img
+          src="/assets/gift-whats.gif"
+          alt="WhatsApp"
+          className="w-full h-full object-contain"
+          draggable="false"
+        />
+      </a>
       <main className="flex-1 flex flex-col items-center justify-center py-8 px-4">
         <h1 className="text-3xl md:text-5xl font-bold text-[#747B7A] mb-6 text-center mt-20">Clear Plex</h1>
         {/* Carrossel de Vídeos */}
@@ -101,9 +126,7 @@ export default function ClearPlex() {
                 }
               }}
             >
-              <source src={videos[currentVideoIndex]} type="video/quicktime" />
               <source src={videos[currentVideoIndex]} type="video/mp4" />
-              <source src={videos[currentVideoIndex]} />
               Seu navegador não suporta o vídeo.
             </video>
           </div>

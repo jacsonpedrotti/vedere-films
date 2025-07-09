@@ -6,11 +6,11 @@ const Header = dynamic(() => import("../../../components/Header"), { ssr: false 
 import Footer from "../../../components/Footer";
 
 const videos = [
-  "/nano-ceramica7.mp4",
-  "/nano-ceramica8.mp4",
-  "/nano-ceramica9.mp4",
-  "/nano-ceramica10.mp4",
-  "/nano-ceramica11.mp4"
+  "/nanoceramica-hd/nano-ceramica-hd1.mp4",
+  "/nanoceramica-hd/nano-ceramica-hd2.mp4",
+  "/nanoceramica-hd/nano-ceramica-hd3.mp4",
+  "/nanoceramica-hd/nano-ceramica-hd4.mp4",
+  "/nanoceramica-hd/nano-ceramica-hd5.mp4"
 ];
 
 export default function FilmCeramica() {
@@ -22,10 +22,18 @@ export default function FilmCeramica() {
     playbackRate: 1
   });
   const [userMuted, setUserMuted] = useState(true);
+  const [isClient, setIsClient] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Verificar se está no cliente
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Carregar preferências salvas
   useEffect(() => {
+    if (!isClient) return;
+    
     const savedPreferences = localStorage.getItem('videoPreferences');
     if (savedPreferences) {
       try {
@@ -39,24 +47,30 @@ export default function FilmCeramica() {
     if (videoRef.current) {
       videoRef.current.play().catch(() => {});
     }
-  }, []);
+  }, [isClient]);
 
   // Carregar preferência de mute do usuário
   useEffect(() => {
+    if (!isClient) return;
+    
     const savedMuted = localStorage.getItem('filmCeramicaMuted');
     if (savedMuted !== null) {
       setUserMuted(savedMuted === 'true');
     }
-  }, []);
+  }, [isClient]);
 
   // Salvar preferências quando mudarem
   const savePreferences = (newPreferences: typeof userPreferences) => {
+    if (!isClient) return;
+    
     setUserPreferences(newPreferences);
     localStorage.setItem('videoPreferences', JSON.stringify(newPreferences));
   };
 
   // Salvar preferência de mute do usuário
   const handleMuteChange = (muted: boolean) => {
+    if (!isClient) return;
+    
     setUserMuted(muted);
     localStorage.setItem('filmCeramicaMuted', muted.toString());
   };
@@ -125,7 +139,7 @@ export default function FilmCeramica() {
         style={{ animation: 'pulse 1.5s infinite' }}
       >
         <img
-          src="/gift-whats.gif"
+          src="/assets/gift-whats.gif"
           alt="WhatsApp"
           className="w-full h-full object-contain"
           draggable="false"
@@ -178,9 +192,7 @@ export default function FilmCeramica() {
                 setIsLoading(false);
               }}
             >
-              <source src={videos[currentVideoIndex]} type="video/quicktime" />
               <source src={videos[currentVideoIndex]} type="video/mp4" />
-              <source src={videos[currentVideoIndex]} />
               Seu navegador não suporta o vídeo.
             </video>
           </div>
