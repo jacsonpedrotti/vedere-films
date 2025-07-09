@@ -1,7 +1,7 @@
 # 🎬 Vedere Films
 
 <div align="center">
-  <img src="public/logo-vedere-50x50.png" alt="Vedere Films Logo" width="200"/>
+  <img src="public/assets/logo-vedere-50x50.png" alt="Vedere Films Logo" width="200"/>
   
   [![Next.js](https://img.shields.io/badge/Next.js-14.0.4-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
   [![React](https://img.shields.io/badge/React-18.2.0-blue?style=for-the-badge&logo=react)](https://reactjs.org/)
