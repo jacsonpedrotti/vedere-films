@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CookieConsent from "../components/CookieConsent";
-import { Typewriter } from 'react-simple-typewriter';
 
 const navItems = [
   { label: "Início", href: "#inicio" },
@@ -63,44 +62,6 @@ export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const sobreVideoRef = React.useRef<HTMLVideoElement>(null);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
-
-  // Exemplo seguro para detectar iOS
-  const isIOS = (() => {
-    if (typeof navigator === "undefined" || !navigator.userAgent) return false;
-    const iOSDevices = ["iPad", "iPhone", "iPod"];
-    return iOSDevices.some(device => navigator.userAgent.includes(device));
-  })();
-
-  // Otimizações específicas para iOS
-  const iOSOptimizations = () => {
-    // Forçar viewport para iOS
-    if (typeof document !== "undefined") {
-      const viewport = document.querySelector('meta[name="viewport"]');
-      if (!viewport) {
-        const meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
-        document.head.appendChild(meta);
-      }
-    }
-
-    // Otimizar vídeos para iOS
-    if (videoRef.current && isIOS) {
-      videoRef.current.setAttribute('playsinline', 'true');
-      videoRef.current.setAttribute('webkit-playsinline', 'true');
-      videoRef.current.setAttribute('muted', 'true');
-    }
-    if (sobreVideoRef.current && isIOS) {
-      sobreVideoRef.current.setAttribute('playsinline', 'true');
-      sobreVideoRef.current.setAttribute('webkit-playsinline', 'true');
-      sobreVideoRef.current.setAttribute('muted', 'true');
-    }
-  };
-
-  // Aplicar otimizações no mount
-  React.useEffect(() => {
-    iOSOptimizations();
-  }, []);
 
   // Efeito para montagem do componente
   React.useEffect(() => {
@@ -237,42 +198,6 @@ export default function Home() {
       }, 10);
     }
   }, []);
-
-  // Forçar autoplay após interação do usuário (especialmente para iOS)
-  useEffect(() => {
-    const handleUserInteraction = () => {
-      if (videoRef.current) {
-        videoRef.current.play().catch(() => {});
-      }
-      if (sobreVideoRef.current) {
-        sobreVideoRef.current.play().catch(() => {});
-      }
-    };
-
-    // Adicionar listeners para interação do usuário
-    document.addEventListener('touchstart', handleUserInteraction, { once: true });
-    document.addEventListener('click', handleUserInteraction, { once: true });
-    document.addEventListener('scroll', handleUserInteraction, { once: true });
-
-    return () => {
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('scroll', handleUserInteraction);
-    };
-  }, []);
-
-  // Forçar play do vídeo do hero após montagem
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (videoRef.current) {
-        videoRef.current.play().catch(() => {});
-      }
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
-
 
   // Função para controlar reprodução de vídeos
   const handleVideoPlay = (serviceKey: string) => {
@@ -414,17 +339,6 @@ export default function Home() {
           playsInline
           preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
-          onLoadedData={() => {
-            if (videoRef.current) {
-              videoRef.current.play().catch(() => {
-                setTimeout(() => {
-                  if (videoRef.current) {
-                    videoRef.current.play().catch(() => {});
-                  }
-                }, 1000);
-              });
-            }
-          }}
           onError={(e) => {
             console.error('Erro no vídeo do hero:', e);
             const videoElement = e.target as HTMLVideoElement;
@@ -447,31 +361,17 @@ export default function Home() {
         <div className="relative z-20 w-full flex flex-col items-end justify-end px-4 md:px-16 lg:px-32 pb-10 md:pb-20">
           <div className="max-w-xl w-full text-center md:text-right mb-8 md:mb-12 mx-auto md:mx-0 mt-56 md:mt-72">
             <h1 className="text-2xl sm:text-3xl md:text-5xl font-semibold mb-4 sm:mb-6 whitespace-nowrap text-[#747B7A]">
-              <Typewriter
-                words={["PROTEÇÃO E ESTILO"]}
-                typeSpeed={70}
-                cursor={false}
-              />
+              PROTEÇÃO E ESTILO
             </h1>
             <p className="text-base sm:text-lg md:text-2xl mb-6 sm:mb-8 text-[#747B7A]">
-              <Typewriter
-                words={["Transformamos a experiência de dirigir veículos premium em algo ainda mais exclusivo."]}
-                typeSpeed={40}
-                delaySpeed={700}
-                cursor={false}
-              />
+              Transformamos a experiência de dirigir veículos premium em algo ainda mais exclusivo.
             </p>
             <div className="flex items-center justify-center md:justify-end gap-2 sm:gap-4 w-full">
               <a
                 href="#contato"
                 className="bg-transparent border-2 border-[#747B7A] text-[#747B7A] px-4 sm:px-8 py-2 sm:py-3 rounded-full font-bold transition-colors hover:border-[#5A605F] hover:text-[#5A605F] text-xs sm:text-sm md:text-base"
               >
-                <Typewriter
-                  words={["ENTRE EM CONTATO"]}
-                  typeSpeed={60}
-                  delaySpeed={1200}
-                  cursor={false}
-                />
+                ENTRE EM CONTATO
               </a>
             </div>
           </div>
@@ -540,7 +440,7 @@ export default function Home() {
             whileInView={{ opacity: 1, x: 0, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="relative h-[1050px] md:h-[900px] rounded-lg overflow-hidden"
+            className="relative h-[600px] md:h-[900px] rounded-lg overflow-hidden"
           >
             <video
               ref={sobreVideoRef}
@@ -979,10 +879,8 @@ export default function Home() {
               alt="Trabalho Vedere Films"
               fill
               className="object-cover"
-              priority={currentImage === 0}
               sizes="(max-width: 768px) 90vw, 1800px"
               style={{ 
-                willChange: 'transform',
                 transform: 'translateZ(0)' // Força aceleração de hardware
               }}
               onLoad={() => {
@@ -1449,7 +1347,7 @@ export default function Home() {
         <h2 className="text-3xl font-bold mb-12 text-[#747B7A] text-center">Como Chegar em Nossa Loja!</h2>
         <div className="rounded-lg overflow-hidden shadow-lg border border-[#222] w-[80vw] max-w-3xl mx-auto">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3535.844389680162!2d-48.547620222823745!3d-27.598353622203213!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x952749fa5df2a80b%3A0x7f61e8e51dece1!2sVedere%20films!5e0!3m2!1sen!2sbr!4v1751926242368!5m2!1sen!2sbr"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d40004.18506921743!2d-48.56025849251254!3d-27.59651142385644!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x952749fa5df2a80b%3A0x7f61e8e51dece1!2sVedere%20films!5e0!3m2!1sen!2sbr!4v1752497666056!5m2!1sen!2sbr"
             className="w-full"
             height="450"
             style={{ border: 0 }}

@@ -169,7 +169,6 @@ export default function FilmCeramica() {
               }}
               autoPlay
               muted={userMuted}
-              playsInline
               preload="auto"
               onEnded={nextVideo}
               onLoadStart={() => setIsLoading(true)}

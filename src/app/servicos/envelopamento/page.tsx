@@ -129,7 +129,6 @@ export default function Envelopamento() {
               style={{ objectFit: 'cover', objectPosition: 'center' }}
               autoPlay
               muted={userMuted}
-              playsInline
               preload="auto"
               onEnded={nextVideo}
               onLoadStart={() => setIsLoading(true)}

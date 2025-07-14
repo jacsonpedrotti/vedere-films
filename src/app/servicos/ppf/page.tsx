@@ -135,7 +135,6 @@ export default function PPF() {
               style={{ objectFit: 'cover', objectPosition: 'center' }}
               autoPlay
               muted={userMuted}
-              playsInline
               preload="auto"
               onEnded={nextVideo}
               onLoadStart={() => setIsLoading(true)}
